@@ -8,9 +8,9 @@ class LocationProvider {
     }
   }
 
-  LatLng get startLocation => LatLng(_locations.first[0], _locations.first[1]);
+  LatLng get pickUpLocation => const LatLng(24.4202043, 54.4402971);
 
-  LatLng get endLocation => LatLng(_locations.last[0], _locations.last[1]);
+  LatLng get deliveryLocation => LatLng(_locations.last[0], _locations.last[1]);
 
   final List<List<double>> _locations = [
     [24.41974, 54.44158],

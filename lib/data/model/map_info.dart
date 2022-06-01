@@ -2,19 +2,24 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapInfo {
   final LatLng currentLocation;
-  final CircularGeoFence startGeoFence;
-  final CircularGeoFence endGeoFence;
+  final CircularGeoFence pickupGeoFence;
+  final CircularGeoFence deliveryGeoFence;
 
   MapInfo({
     required this.currentLocation,
-    required this.startGeoFence,
-    required this.endGeoFence,
+    required this.pickupGeoFence,
+    required this.deliveryGeoFence,
   });
 }
 
 class CircularGeoFence {
   final LatLng center;
-  final double radiusInMeters;
+  final double reachedRadiusInMeters;
+  final double nearRadiusInMeters;
 
-  CircularGeoFence({required this.center, required this.radiusInMeters});
+  CircularGeoFence({
+    required this.center,
+    required this.reachedRadiusInMeters,
+    required this.nearRadiusInMeters,
+  });
 }

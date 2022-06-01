@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:handover/data/location_provider.dart';
 import 'package:handover/data/model/handover.dart';
 import 'package:handover/data/model/handover_status.dart';
@@ -14,53 +15,72 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
   LiveTrackingCubit({required LocationProvider locationProvider})
       : _locationProvider = locationProvider,
         super(LiveTrackingInitial());
-  final Handover _handover = Handover(
+  Handover _handover = Handover(
     user: User(
       name: 'Mohamed Abdalmohsin',
       profilePictureUrl:
           'https://i.picsum.photos/id/431/200/300.jpg?hmac=aUpIWBq8svIaK2ruTnNG-BZuvcDsK9Mr9PuJuYAYEQ0',
     ),
-    handoverStatus: HandoverStatus.started,
+    handoverStatus: HandoverStatus.onRoute,
   );
 
+  final reachedRadiusInMeters = 50.0;
+  final nearRadiusInMeters = 180.0;
+
   start() {
-    const radiusInMeters = 100.0;
-    final s = _locationProvider.locationStream();
-
-    print('start');
     _locationProvider.locationStream().listen((loc) {
-      final startLoc = _locationProvider.startLocation;
-      final endLoc = _locationProvider.endLocation;
+      final pickupLoc = _locationProvider.pickUpLocation;
+      final deliveryLoc = _locationProvider.deliveryLocation;
 
-      final distanceFromStart = Geolocator.distanceBetween(
-          loc.latitude, loc.longitude, startLoc.latitude, startLoc.longitude);
-      final distanceFromEnd = Geolocator.distanceBetween(
-          loc.latitude, loc.longitude, endLoc.latitude, endLoc.longitude);
-
-      var handoverStatus = HandoverStatus.onRoute;
-      if (distanceFromStart < radiusInMeters) {
-        handoverStatus = HandoverStatus.started;
-      } else if (distanceFromEnd < radiusInMeters) {
-        handoverStatus = HandoverStatus.delivered;
-      }
+      _updateHandoverStatus(loc, pickupLoc, deliveryLoc);
 
       final mapInfo = MapInfo(
         currentLocation: loc,
-        startGeoFence:
-            CircularGeoFence(center: startLoc, radiusInMeters: radiusInMeters),
-        endGeoFence:
-            CircularGeoFence(center: endLoc, radiusInMeters: radiusInMeters),
+        pickupGeoFence: CircularGeoFence(
+          center: pickupLoc,
+          reachedRadiusInMeters: reachedRadiusInMeters,
+          nearRadiusInMeters: nearRadiusInMeters,
+        ),
+        deliveryGeoFence: CircularGeoFence(
+          center: deliveryLoc,
+          reachedRadiusInMeters: reachedRadiusInMeters,
+          nearRadiusInMeters: nearRadiusInMeters,
+        ),
       );
-      print('emit LiveTrackingCurrentState');
-      emit(LiveTrackingCurrentState(
-          mapInfo: mapInfo,
-          handover: _handover.copyWith(handoverStatus: handoverStatus)));
+      // print('emit LiveTrackingCurrentState');
+      emit(LiveTrackingCurrentState(mapInfo: mapInfo, handover: _handover));
     });
   }
 
-  @override
-  void onChange(Change<LiveTrackingState> change) {
-    super.onChange(change);
-    // print('new state: ${change.nextState}');
+  _updateHandoverStatus(LatLng loc, LatLng pickupLoc, LatLng deliveryLoc) {
+    final distanceFromPickup = Geolocator.distanceBetween(
+        loc.latitude, loc.longitude, pickupLoc.latitude, pickupLoc.longitude);
+    final distanceFromDelivery = Geolocator.distanceBetween(loc.latitude,
+        loc.longitude, deliveryLoc.latitude, deliveryLoc.longitude);
+
+    var handoverStatus = _handover.handoverStatus;
+
+    if (distanceFromPickup < nearRadiusInMeters &&
+        handoverStatus.value < HandoverStatus.nearPickup.value) {
+      handoverStatus = HandoverStatus.nearPickup;
+    } else if (distanceFromPickup < reachedRadiusInMeters &&
+        handoverStatus.value < HandoverStatus.pickedUp.value) {
+      handoverStatus = HandoverStatus.pickedUp;
+      if (_handover.pickupTime == null) {
+        _handover = _handover.copyWith(pickupTime: DateTime.now());
+      }
+    } else if (distanceFromDelivery < nearRadiusInMeters &&
+        handoverStatus.value < HandoverStatus.nearDelivery.value) {
+      handoverStatus = HandoverStatus.nearDelivery;
+    } else if (distanceFromDelivery < reachedRadiusInMeters &&
+        handoverStatus.value < HandoverStatus.delivered.value) {
+      handoverStatus = HandoverStatus.delivered;
+      if (_handover.deliveryTime == null) {
+        _handover = _handover.copyWith(deliveryTime: DateTime.now());
+      }
+    }
+    _handover = _handover.copyWith(handoverStatus: handoverStatus);
+    print('${_handover.handoverStatus} pickup: $distanceFromPickup deliver: $distanceFromDelivery');
   }
+
 }
