@@ -6,6 +6,7 @@ enum HandoverStatus {
   pickedUp,
   nearDelivery,
   delivered,
+  finished,
 }
 
 extension HandoverStatusExtension on HandoverStatus {
@@ -21,6 +22,8 @@ extension HandoverStatusExtension on HandoverStatus {
         return 4;
       case HandoverStatus.delivered:
         return 5;
+      case HandoverStatus.finished:
+        return 6;
     }
   }
 }

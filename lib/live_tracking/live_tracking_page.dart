@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_animarker/widgets/animarker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:handover/data/model/handover_status.dart';
 import 'package:handover/data/model/map_info.dart';
 import 'package:handover/live_tracking/cubit/live_tracking_cubit.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:intl/intl.dart';
 
 class LiveTrackingPage extends StatefulWidget {
   const LiveTrackingPage({Key? key}) : super(key: key);
@@ -48,39 +51,176 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    const horizontalPaddingValue = 45.0;
+    const padding = EdgeInsets.symmetric(horizontal: horizontalPaddingValue);
+
+    final formatter = DateFormat('hh:mm');
+    final textStyle = Theme.of(context).textTheme.bodyText1!;
+
     return Scaffold(
       body: BlocBuilder<LiveTrackingCubit, LiveTrackingState>(
         builder: (context, state) {
           if (state is LiveTrackingCurrentState) {
             return SlidingUpPanel(
+                minHeight: screenSize.height / 3,
+                parallaxEnabled: true,
+                parallaxOffset: 0.7,
                 header: SizedBox(
                   width: screenSize.width,
                   child: Center(
-                    child: Container(
-                      height: _profileImageSize,
-                      width: _profileImageSize,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            state.handover.user.profilePictureUrl,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: _profileImageSize,
+                          width: _profileImageSize,
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(
+                                state.handover.user.profilePictureUrl,
+                              ),
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          fit: BoxFit.cover,
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        Text(
+                          state.handover.user.name,
+                          style: textStyle,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
                   ),
                 ),
                 panel: Padding(
                   padding: const EdgeInsets.only(top: _profileImageSize / 2),
                   child: Container(
+                    padding:
+                        const EdgeInsets.only(top: _profileImageSize * 1.25),
                     child: Center(
-                      child: Text(
-                          '${state.handover.handoverStatus}\n ${state.handover.pickupTime}\n ${state.handover.deliveryTime}'),
+                      child: Builder(builder: (context) {
+                        if (state.handover.handoverStatus ==
+                                HandoverStatus.finished) {
+                          return Column(
+                            children: [
+                              Container(
+                                width: screenSize.width,
+                                padding: padding,
+                                child: RatingBar.builder(
+                                  initialRating: 0,
+                                  minRating: 0,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  itemCount: 5,
+                                  itemBuilder: (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.blue,
+                                  ),
+                                  unratedColor: Colors.white,
+                                  wrapAlignment: WrapAlignment.spaceBetween,
+                                  glow: false,
+                                  onRatingUpdate: (rating) {
+                                    print(rating);
+                                  },
+                                ),
+                              ),
+                              const Spacer(),
+                              Container(
+                                padding: padding,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Pickup Time',
+                                      style: textStyle,
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      state.handover.pickupTime != null
+                                          ? formatter.format(
+                                              state.handover.pickupTime!)
+                                          : 'unknown',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Container(
+                                padding: padding,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      'Delivery Time',
+                                      style: textStyle,
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      state.handover.deliveryTime != null
+                                          ? formatter.format(
+                                              state.handover.deliveryTime!)
+                                          : 'unknown',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 40),
+                              Container(
+                                padding: padding,
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  'Total',
+                                  style: textStyle,
+                                ),
+                              ),
+                              const SizedBox(height: 30),
+                              Container(
+                                padding: padding.copyWith(right: 0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '\$30.00',
+                                      style: textStyle.copyWith(fontSize: 20),
+                                    ),
+                                    const Spacer(),
+                                    Container(
+                                      height: 40,
+                                      width: screenSize.width * .55,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            'Submit',
+                                            style: textStyle,
+                                          ),
+                                          const SizedBox(width: 40),
+                                          const Icon(Icons.arrow_right_alt),
+                                          const SizedBox(width: 20),
+                                        ],
+                                      ),
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(30),
+                                            bottomLeft: Radius.circular(30),
+                                          )),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: screenSize.height / 20,
+                              ),
+                            ],
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }),
                     ),
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: Color(0xfffbaf03),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
@@ -124,21 +264,21 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
             tag: 'pickup',
             center: mapInfo.pickupGeoFence.center,
             l1RadiusMeters: 10,
-            l1Color: Colors.blue[900]!,
+            l1Color: Colors.cyan[900]!,
             l2RadiusMeters: mapInfo.pickupGeoFence.reachedRadiusInMeters,
-            l2Color: Colors.blue,
+            l2Color: Colors.cyan,
             l3RadiusMeters: mapInfo.pickupGeoFence.nearRadiusInMeters,
-            l3Color: Colors.blue[300]!,
+            l3Color: Colors.cyan[300]!,
           ),
           ..._buildThreeCircles(
             tag: 'delivery',
             center: mapInfo.deliveryGeoFence.center,
             l1RadiusMeters: 10,
-            l1Color: Colors.yellow[900]!,
+            l1Color: Colors.blue[900]!,
             l2RadiusMeters: mapInfo.deliveryGeoFence.reachedRadiusInMeters,
-            l2Color: Colors.yellow,
+            l2Color: Colors.blue,
             l3RadiusMeters: mapInfo.deliveryGeoFence.nearRadiusInMeters,
-            l3Color: Colors.yellow[300]!,
+            l3Color: Colors.blue[300]!,
           ),
         },
         onMapCreated: (GoogleMapController controller) {

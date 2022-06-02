@@ -49,6 +49,12 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
       );
       // print('emit LiveTrackingCurrentState');
       emit(LiveTrackingCurrentState(mapInfo: mapInfo, handover: _handover));
+    }, onDone: () {
+      if (_handover.handoverStatus == HandoverStatus.delivered &&
+          state is LiveTrackingCurrentState) {
+        _handover = _handover.copyWith(handoverStatus: HandoverStatus.finished);
+        emit((state as LiveTrackingCurrentState).copyWith(handover: _handover));
+      }
     });
   }
 
@@ -80,7 +86,7 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
       }
     }
     _handover = _handover.copyWith(handoverStatus: handoverStatus);
-    print('${_handover.handoverStatus} pickup: $distanceFromPickup deliver: $distanceFromDelivery');
+    print(
+        '${_handover.handoverStatus} pickup: $distanceFromPickup deliver: $distanceFromDelivery');
   }
-
 }
