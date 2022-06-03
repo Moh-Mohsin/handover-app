@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animarker/widgets/animarker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:handover/data/model/handover_status.dart';
 import 'package:handover/data/model/map_info.dart';
@@ -228,12 +229,12 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                             ],
                           );
                         } else {
-                          return CustomStepper(steps: [
-                            CustomStep('this is a step'),
-                            CustomStep('this is a step'),
-                            CustomStep('this is a step'),
-                            CustomStep('this is a step'),
-                          ], currentStepIndex: 2);
+                          return CustomStepper(
+                              steps: state.stepsData.titles
+                                  .map((title) => CustomStep(title))
+                                  .toList(),
+                              currentStepIndex:
+                                  state.stepsData.currentStepIndex);
                         }
                       }),
                     ),

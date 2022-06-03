@@ -4,7 +4,7 @@ class CustomStepper extends StatelessWidget {
   final List<CustomStep> steps;
   final int currentStepIndex;
 
-  CustomStepper({Key? key, required this.steps, required this.currentStepIndex})
+  const CustomStepper({Key? key, required this.steps, required this.currentStepIndex})
       : assert(steps.length >= 2),
         assert(currentStepIndex < steps.length),
         super(key: key);
@@ -24,8 +24,8 @@ class CustomStepper extends StatelessWidget {
     final isLast = index == steps.length - 1;
     final shouldHighlight = index <= currentStepIndex;
     final shouldHighlightNext = index < currentStepIndex;
-    final color = shouldHighlight ? Colors.black : Colors.grey;
-    final nextColor = shouldHighlightNext ? Colors.black : Colors.grey;
+    final color = shouldHighlight ? Colors.black : Colors.white;
+    final nextColor = shouldHighlightNext ? Colors.black : Colors.white;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Row(

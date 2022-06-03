@@ -4,6 +4,7 @@ import 'package:handover/data/location_provider.dart';
 import 'package:handover/data/model/handover.dart';
 import 'package:handover/data/model/handover_status.dart';
 import 'package:handover/data/model/map_info.dart';
+import 'package:handover/data/model/step_data.dart';
 import 'package:handover/data/model/user.dart';
 import 'package:meta/meta.dart';
 import 'package:geolocator/geolocator.dart';
@@ -48,7 +49,12 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
         ),
       );
       // print('emit LiveTrackingCurrentState');
-      emit(LiveTrackingCurrentState(mapInfo: mapInfo, handover: _handover));
+      emit(LiveTrackingCurrentState(
+          mapInfo: mapInfo,
+          handover: _handover,
+          stepsData: _getStepData(
+            _handover.handoverStatus,
+          )));
     }, onDone: () {
       if (_handover.handoverStatus == HandoverStatus.delivered &&
           state is LiveTrackingCurrentState) {
@@ -88,5 +94,18 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
     _handover = _handover.copyWith(handoverStatus: handoverStatus);
     print(
         '${_handover.handoverStatus} pickup: $distanceFromPickup deliver: $distanceFromDelivery');
+  }
+
+  Map<HandoverStatus, String> stepsMap = {
+    HandoverStatus.onRoute: "On the way",
+    HandoverStatus.nearPickup: "Near Pickup",
+    HandoverStatus.pickedUp: "Pickup Delivery",
+    HandoverStatus.nearDelivery: "Near Delivery destination",
+    HandoverStatus.delivered: "Delivered package",
+  };
+  StepsData _getStepData(HandoverStatus handoverStatus) {
+    return StepsData(
+        titles: stepsMap.values.toList(),
+        currentStepIndex: stepsMap.keys.toList().indexOf(handoverStatus));
   }
 }
