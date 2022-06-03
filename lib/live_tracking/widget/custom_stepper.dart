@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 class CustomStepper extends StatelessWidget {
   final List<CustomStep> steps;
   final int currentStepIndex;
+  final TextStyle textStyle;
 
-  const CustomStepper({Key? key, required this.steps, required this.currentStepIndex})
+  const CustomStepper(
+      {Key? key,
+      required this.steps,
+      required this.currentStepIndex,
+      required this.textStyle})
       : assert(steps.length >= 2),
         assert(currentStepIndex < steps.length),
         super(key: key);
@@ -44,8 +49,7 @@ class CustomStepper extends StatelessWidget {
           ),
           Text(
             step.title,
-            style:
-                Theme.of(context).textTheme.bodyText2?.copyWith(color: color),
+            style: textStyle.copyWith(color: color),
           )
         ],
       ),
