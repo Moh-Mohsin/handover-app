@@ -5,12 +5,15 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:handover/data/location_provider.dart';
 import 'package:handover/live_tracking/cubit/live_tracking_cubit.dart';
 import 'package:handover/live_tracking/live_tracking_page.dart';
+import 'package:handover/tools/notification_helper.dart';
 
-void main() {
+void main() async {
   // enable Hybrid Composition for Android
+  WidgetsFlutterBinding.ensureInitialized();
   if (defaultTargetPlatform == TargetPlatform.android) {
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
   }
+  await NotificationHelper().init();
   runApp(const MyApp());
 }
 

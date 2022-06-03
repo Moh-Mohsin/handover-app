@@ -36,6 +36,7 @@ dependencies:
   flutter_animarker: ^3.2.0
   sliding_up_panel: ^2.0.0+1
   intl: ^0.17.0
+  flutter_local_notifications: ^9.5.3+1
   flutter_rating_bar:
     git:
       url: https://github.com/Moh-Mohsin/flutter_rating_bar.git

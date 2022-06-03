@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:handover/data/model/handover_status.dart';
 import 'package:handover/data/model/map_info.dart';
 import 'package:handover/live_tracking/cubit/live_tracking_cubit.dart';
+import 'package:handover/tools/notification_helper.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:intl/intl.dart';
 
@@ -58,7 +59,18 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
     final textStyle = Theme.of(context).textTheme.bodyText1!;
 
     return Scaffold(
-      body: BlocBuilder<LiveTrackingCubit, LiveTrackingState>(
+      body: BlocConsumer<LiveTrackingCubit, LiveTrackingState>(
+        listenWhen: (previous, current) {
+          return current is LiveTrackingCurrentState &&
+              (previous is LiveTrackingInitial ||
+                  (previous is LiveTrackingCurrentState &&
+                      current.handover.handoverStatus !=
+                          previous.handover.handoverStatus));
+        },
+        listener: (context, state) {
+          _showNotification(
+              (state as LiveTrackingCurrentState).handover.handoverStatus);
+        },
         builder: (context, state) {
           if (state is LiveTrackingCurrentState) {
             return SlidingUpPanel(
@@ -102,7 +114,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                     child: Center(
                       child: Builder(builder: (context) {
                         if (state.handover.handoverStatus ==
-                                HandoverStatus.finished) {
+                            HandoverStatus.finished) {
                           return Column(
                             children: [
                               Container(
@@ -321,5 +333,10 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
         strokeColor: l1Color,
       ),
     };
+  }
+
+  void _showNotification(HandoverStatus handoverStatus) {
+    NotificationHelper().showNotification(
+        'Delivery update', 'new status: ${handoverStatus.name}');
   }
 }
