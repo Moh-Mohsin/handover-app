@@ -40,7 +40,9 @@ class MyApp extends StatelessWidget {
       home: BlocProvider<LiveTrackingCubit>(
         create: (context) =>
             LiveTrackingCubit(locationProvider: LocationProvider()),
-        child: const LiveTrackingPage(),
+        child: const Scaffold(
+          body: LiveTrackingPage(),
+        ),
       ),
     );
   }

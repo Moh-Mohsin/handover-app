@@ -8,6 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:handover/data/model/handover_status.dart';
 import 'package:handover/data/model/map_info.dart';
 import 'package:handover/live_tracking/cubit/live_tracking_cubit.dart';
+import 'package:handover/live_tracking/widget/custom_stepper.dart';
 import 'package:handover/tools/notification_helper.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:intl/intl.dart';
@@ -227,7 +228,12 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                             ],
                           );
                         } else {
-                          return Container();
+                          return CustomStepper(steps: [
+                            CustomStep('this is a step'),
+                            CustomStep('this is a step'),
+                            CustomStep('this is a step'),
+                            CustomStep('this is a step'),
+                          ], currentStepIndex: 2);
                         }
                       }),
                     ),
