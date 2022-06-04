@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:handover/data/location_provider.dart';
@@ -28,8 +30,10 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
   final reachedRadiusInMeters = 50.0;
   final nearRadiusInMeters = 180.0;
 
+  StreamSubscription<LatLng>? locListner;
+
   start() {
-    _locationProvider.locationStream().listen((loc) {
+    locListner = _locationProvider.locationStream().listen((loc) {
       final pickupLoc = _locationProvider.pickUpLocation;
       final deliveryLoc = _locationProvider.deliveryLocation;
 
@@ -64,6 +68,10 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
     });
   }
 
+  void onDispose() {
+    locListner?.cancel();
+  }
+
   _updateHandoverStatus(LatLng loc, LatLng pickupLoc, LatLng deliveryLoc) {
     final distanceFromPickup = Geolocator.distanceBetween(
         loc.latitude, loc.longitude, pickupLoc.latitude, pickupLoc.longitude);
@@ -92,8 +100,6 @@ class LiveTrackingCubit extends Cubit<LiveTrackingState> {
       }
     }
     _handover = _handover.copyWith(handoverStatus: handoverStatus);
-    print(
-        '${_handover.handoverStatus} pickup: $distanceFromPickup deliver: $distanceFromDelivery');
   }
 
   Map<HandoverStatus, String> stepsMap = {

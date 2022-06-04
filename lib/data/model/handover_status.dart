@@ -1,5 +1,3 @@
-// TODO: can enhanced Enums be used?
-
 enum HandoverStatus {
   onRoute,
   nearPickup,

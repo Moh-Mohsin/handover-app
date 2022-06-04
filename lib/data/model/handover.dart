@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:handover/data/model/handover_status.dart';
 
 import 'user.dart';

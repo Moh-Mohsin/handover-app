@@ -23,10 +23,6 @@ class LiveTrackingPage extends StatefulWidget {
 
 class _LiveTrackingPageState extends State<LiveTrackingPage> {
   final Completer<GoogleMapController> _controller = Completer();
-  static const CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962),
-    zoom: 14.4746,
-  );
   StreamSubscription<LiveTrackingState>? _stateSub;
 
   static const _profileImageSize = 100.0;
@@ -41,6 +37,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
   @override
   void dispose() {
     _stateSub?.cancel();
+    BlocProvider.of<LiveTrackingCubit>(context).onDispose();
     super.dispose();
   }
 
@@ -81,16 +78,18 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                       child: Builder(builder: (context) {
                         if (state.handover.handoverStatus ==
                             HandoverStatus.finished) {
+                          // this shows up when the handover/delivery is finished
                           return _buildSummeryWidget(
                               screenSize, padding, textStyle, state);
                         } else {
+                          // a ccustom stepper widget that highlights finished steps
                           return CustomStepper(
                               steps: state.stepsData.titles
                                   .map((title) => CustomStep(title))
                                   .toList(),
                               currentStepIndex:
                                   state.stepsData.currentStepIndex,
-                                  textStyle: textStyle);
+                              textStyle: textStyle);
                         }
                       }),
                     ),
@@ -114,6 +113,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
     );
   }
 
+  /// user profile picture and name
   SizedBox _buildUserWidget(
       Size screenSize, LiveTrackingCurrentState state, TextStyle textStyle) {
     return SizedBox(
@@ -147,6 +147,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
     );
   }
 
+  /// shows rating and handover summery
   Column _buildSummeryWidget(Size screenSize, EdgeInsets padding,
       TextStyle textStyle, LiveTrackingCurrentState state) {
     final formatter = DateFormat('hh:mm');
@@ -168,9 +169,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
             unratedColor: Colors.white,
             wrapAlignment: WrapAlignment.spaceBetween,
             glow: false,
-            onRatingUpdate: (rating) {
-              print(rating);
-            },
+            onRatingUpdate: (rating) {},
           ),
         ),
         const Spacer(),

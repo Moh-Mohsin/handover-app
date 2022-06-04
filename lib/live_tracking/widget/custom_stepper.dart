@@ -5,12 +5,12 @@ class CustomStepper extends StatelessWidget {
   final int currentStepIndex;
   final TextStyle textStyle;
 
-  const CustomStepper(
-      {Key? key,
-      required this.steps,
-      required this.currentStepIndex,
-      required this.textStyle})
-      : assert(steps.length >= 2),
+  const CustomStepper({
+    Key? key,
+    required this.steps,
+    required this.currentStepIndex,
+    required this.textStyle,
+  })  : assert(steps.length >= 2),
         assert(currentStepIndex < steps.length),
         super(key: key);
 
@@ -57,6 +57,7 @@ class CustomStepper extends StatelessWidget {
   }
 }
 
+/// this is a custom painter to draw the lines and dots for each step
 class CustomStepIndicatorPainter extends CustomPainter {
   final bool isFirstStep;
   final bool isLastStep;
@@ -79,11 +80,14 @@ class CustomStepIndicatorPainter extends CustomPainter {
     paint.style = PaintingStyle.fill;
     paint.color = color;
 
+    // draw a vertical line from top to center unless its the first step
     if (!isFirstStep) {
       canvas.drawLine(const Offset(_dotRadius, 0),
           Offset(_dotRadius, size.height / 2), paint..strokeWidth = _lineWidth);
     }
-
+    // draw a vertical line from center to bottom unless its the last step.
+    // note that the color could be different from the first line since this line 
+    // is acutally for the next step
     if (!isLastStep) {
       canvas.drawLine(
           Offset(_dotRadius, size.height / 2),
@@ -93,6 +97,7 @@ class CustomStepIndicatorPainter extends CustomPainter {
             ..color = nextColor);
     }
 
+    // this is the dot for the step, centered and always shown
     canvas.drawCircle(
         Offset(_dotRadius, size.height / 2), _dotRadius, paint..color = color);
   }
