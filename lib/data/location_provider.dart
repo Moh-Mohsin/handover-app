@@ -1,7 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationProvider {
-
   // we will use this to mock a location stream
   Stream<LatLng> locationStream() async* {
     for (final loc in _locations) {

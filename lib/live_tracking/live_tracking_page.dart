@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animarker/widgets/animarker.dart';
@@ -66,6 +67,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
           if (state is LiveTrackingCurrentState) {
             return SlidingUpPanel(
                 minHeight: screenSize.height / 3,
+                maxHeight: max(screenSize.height * 0.66, 400),
                 parallaxEnabled: true,
                 parallaxOffset: 0.7,
                 header: _buildUserWidget(screenSize, state, textStyle),
@@ -73,7 +75,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                   padding: const EdgeInsets.only(top: _profileImageSize / 2),
                   child: Container(
                     padding:
-                        const EdgeInsets.only(top: _profileImageSize * 1.25),
+                        const EdgeInsets.only(top: _profileImageSize * 1.2),
                     child: Center(
                       child: Builder(builder: (context) {
                         if (state.handover.handoverStatus ==
@@ -83,13 +85,17 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                               screenSize, padding, textStyle, state);
                         } else {
                           // a ccustom stepper widget that highlights finished steps
-                          return CustomStepper(
-                              steps: state.stepsData.titles
-                                  .map((title) => CustomStep(title))
-                                  .toList(),
-                              currentStepIndex:
-                                  state.stepsData.currentStepIndex,
-                              textStyle: textStyle);
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                left: 30, right: 30, bottom: 30),
+                            child: CustomStepper(
+                                steps: state.stepsData.titles
+                                    .map((title) => CustomStep(title))
+                                    .toList(),
+                                currentStepIndex:
+                                    state.stepsData.currentStepIndex,
+                                textStyle: textStyle),
+                          );
                         }
                       }),
                     ),
@@ -190,7 +196,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 10),
         Container(
           padding: padding,
           child: Row(
@@ -208,7 +214,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
             ],
           ),
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
         Container(
           padding: padding,
           alignment: Alignment.topLeft,
@@ -233,7 +239,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
                 },
                 child: Container(
                   height: 40,
-                  width: screenSize.width * .55,
+                  width: min(screenSize.width * .55, 250),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -258,7 +264,7 @@ class _LiveTrackingPageState extends State<LiveTrackingPage> {
           ),
         ),
         SizedBox(
-          height: screenSize.height / 20,
+          height: max(screenSize.height / 20, 30),
         ),
       ],
     );

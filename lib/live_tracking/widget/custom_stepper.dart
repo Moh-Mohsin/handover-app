@@ -19,7 +19,7 @@ class CustomStepper extends StatelessWidget {
     return Column(
       children: [
         for (var i = 0; i < steps.length; i++)
-          _buildStepWidget(context, i, steps[i])
+          Expanded(child: _buildStepWidget(context, i, steps[i]))
       ],
     );
   }
@@ -27,32 +27,33 @@ class CustomStepper extends StatelessWidget {
   Widget _buildStepWidget(BuildContext context, int index, CustomStep step) {
     final isFirst = index == 0;
     final isLast = index == steps.length - 1;
+
+    // highlight current step and steps befroe it
     final shouldHighlight = index <= currentStepIndex;
+
     final shouldHighlightNext = index < currentStepIndex;
+
     final color = shouldHighlight ? Colors.black : Colors.white;
     final nextColor = shouldHighlightNext ? Colors.black : Colors.white;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          CustomPaint(
-            size: const Size(20, 60),
-            painter: CustomStepIndicatorPainter(
-                isFirstStep: isFirst,
-                isLastStep: isLast,
-                color: color,
-                nextColor: nextColor),
-          ),
-          const SizedBox(
-            width: 50,
-          ),
-          Text(
-            step.title,
-            style: textStyle.copyWith(color: color),
-          )
-        ],
-      ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        CustomPaint(
+          size: const Size(20, double.infinity),
+          painter: CustomStepIndicatorPainter(
+              isFirstStep: isFirst,
+              isLastStep: isLast,
+              color: color,
+              nextColor: nextColor),
+        ),
+        const SizedBox(
+          width: 50,
+        ),
+        Text(
+          step.title,
+          style: textStyle.copyWith(color: color),
+        )
+      ],
     );
   }
 }
@@ -86,7 +87,7 @@ class CustomStepIndicatorPainter extends CustomPainter {
           Offset(_dotRadius, size.height / 2), paint..strokeWidth = _lineWidth);
     }
     // draw a vertical line from center to bottom unless its the last step.
-    // note that the color could be different from the first line since this line 
+    // note that the color could be different from the first line since this line
     // is acutally for the next step
     if (!isLastStep) {
       canvas.drawLine(
